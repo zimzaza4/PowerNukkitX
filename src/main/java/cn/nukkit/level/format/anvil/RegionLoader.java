@@ -3,6 +3,7 @@ package cn.nukkit.level.format.anvil;
 import cn.nukkit.Server;
 import cn.nukkit.api.PowerNukkitOnly;
 import cn.nukkit.api.Since;
+import cn.nukkit.block.BlockID;
 import cn.nukkit.blockstate.BlockState;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.format.FullChunk;
@@ -99,13 +100,20 @@ public class RegionLoader extends BaseRegionLoader {
                         chunkUpdated.add(chunkHash);
                         chunk.isNew384World = true; //这可以在大部分情况下避免区块重复更新，但是对多线程造成的重复更新仍然无效，所以需要一个set来检查
                         log.info(Server.getInstance().getLanguage().translateString("nukkit.anvil.converter.update-chunk", levelProvider.getLevel().getName(), chunk.getX() << 4, chunk.getZ() << 4));
+                        BlockState tmpState;
                         for (int dx = 0; dx < 16; dx++) {
                             for (int dz = 0; dz < 16; dz++) {
                                 for (int dy = 255; dy >= -64; --dy) {
-                                    chunk.setBlockState(dx, dy + 64, dz, chunk.getBlockState(dx, dy, dz));
-                                    chunk.setBlockStateAtLayer(dx, dy + 64, dz, 1, chunk.getBlockState(dx, dy, dz, 1));
-                                    chunk.setBlockState(dx, dy, dz, BlockState.AIR);
-                                    chunk.setBlockStateAtLayer(dx, dy, dz, 1, BlockState.AIR);
+                                    tmpState = chunk.getBlockState(dx, dy, dz);
+                                    if (tmpState.getBlockId() != BlockID.AIR) {
+                                        chunk.setBlockState(dx, dy + 64, dz, tmpState);
+                                        chunk.setBlockState(dx, dy, dz, BlockState.AIR);
+                                    }
+                                    tmpState = chunk.getBlockState(dx, dy, dz, 1);
+                                    if (tmpState.getBlockId() != BlockID.AIR) {
+                                        chunk.setBlockStateAtLayer(dx, dy + 64, dz, 1, chunk.getBlockState(dx, dy, dz, 1));
+                                        chunk.setBlockStateAtLayer(dx, dy, dz, 1, BlockState.AIR);
+                                    }
                                 }
                             }
                         }
