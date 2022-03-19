@@ -1,12 +1,18 @@
 package cn.nukkit.command.defaults;
 
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.ConsoleCommandSender;
 import cn.nukkit.command.data.CommandParamType;
 import cn.nukkit.command.data.CommandParameter;
+import cn.nukkit.entity.Entity;
 import cn.nukkit.lang.TranslationContainer;
+import cn.nukkit.level.Position;
+import cn.nukkit.utils.EntitySelector;
 import cn.nukkit.utils.TextFormat;
+
+import java.util.List;
 
 /**
  * @author xtypr
@@ -26,7 +32,7 @@ public class SayCommand extends VanillaCommand {
     @Override
     public boolean execute(CommandSender sender, String commandLabel, String[] args) {
         if (!this.testPermission(sender)) {
-            return true;
+            return false;
         }
 
         if (args.length == 0) {
@@ -34,18 +40,18 @@ public class SayCommand extends VanillaCommand {
             return false;
         }
 
-        String senderString;
-        if (sender instanceof Player) {
-            senderString = ((Player) sender).getDisplayName();
-        } else if (sender instanceof ConsoleCommandSender) {
-            senderString = "Server";
-        } else {
-            senderString = sender.getName();
-        }
+        String senderString = sender.getName();
 
         StringBuilder msg = new StringBuilder();
         for (String arg : args) {
-            msg.append(arg).append(" ");
+            if (EntitySelector.hasArguments(arg)){
+                List<Entity> entities = EntitySelector.matchEntities(sender, arg);
+                for(Entity entity : entities){
+                    msg.append(entity.getName()).append(" ");
+                }
+            }else {
+                msg.append(arg).append(" ");
+            }
         }
         if (msg.length() > 0) {
             msg = new StringBuilder(msg.substring(0, msg.length() - 1));
