@@ -11,6 +11,7 @@ import com.google.common.io.ByteStreams;
 import lombok.ToString;
 
 import java.io.InputStream;
+import java.nio.ByteOrder;
 
 @ToString(exclude = {"tag"})
 public class AvailableEntityIdentifiersPacket extends DataPacket {
@@ -25,14 +26,14 @@ public class AvailableEntityIdentifiersPacket extends DataPacket {
                 throw new AssertionError("Could not find entity_identifiers.dat");
             }
             //noinspection UnstableApiUsage
-            CompoundTag nbt = NBTIO.read(inputStream);
+            CompoundTag nbt = (CompoundTag) NBTIO.readTag(inputStream, ByteOrder.BIG_ENDIAN, false);
             ListTag<CompoundTag> list = nbt.getList("idlist", CompoundTag.class);
 
             for (CustomEntityDefinition definition : Server.getInstance().getCustomEntityManager().getCustomEntitiesDefinition().values()) {
-                list.add(definition.getNbt());
+                list.add(definition.nbt());
             }
             nbt.putList(list);
-            TAG = NBTIO.writeNetwork(nbt);
+            TAG = NBTIO.write((CompoundTag) nbt.getAllTags(), ByteOrder.BIG_ENDIAN, false);
         } catch (Exception e) {
             throw new AssertionError("Error whilst loading entity_identifiers.dat", e);
         }
