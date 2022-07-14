@@ -3,13 +3,9 @@ package cn.nukkit.network.protocol;
 import cn.nukkit.Nukkit;
 import cn.nukkit.Server;
 import cn.nukkit.entity.custom.CustomEntityDefinition;
-import cn.nukkit.entity.custom.CustomEntityManager;
 import cn.nukkit.nbt.NBTIO;
-import cn.nukkit.nbt.stream.NBTInputStream;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
-import cn.nukkit.nbt.tag.Tag;
-import com.google.common.io.ByteStreams;
 import lombok.ToString;
 
 import java.io.BufferedInputStream;
@@ -33,14 +29,14 @@ public class AvailableEntityIdentifiersPacket extends DataPacket {
             //noinspection UnstableApiUsage
 
             BufferedInputStream bis = new BufferedInputStream(inputStream);
-            CompoundTag nbt = NBTIO.read(bis, ByteOrder.BIG_ENDIAN, true);
+            CompoundTag nbt = NBTIO.read(bis, ByteOrder.BIG_ENDIAN, false);
             ListTag<CompoundTag> list = nbt.getList("idlist", CompoundTag.class);
-
             for (CustomEntityDefinition definition : Server.getInstance().getCustomEntityManager().getCustomEntitiesDefinition().values()) {
                 list.add(definition.nbt());
             }
             nbt.putList(list);
-            TAG = NBTIO.write((CompoundTag) nbt.getAllTags(), ByteOrder.BIG_ENDIAN, false);
+            System.out.println(nbt);
+            TAG = NBTIO.write(nbt, ByteOrder.BIG_ENDIAN, false);
         } catch (Exception e) {
             throw new AssertionError("Error whilst loading entity_identifiers.dat", e);
         }
