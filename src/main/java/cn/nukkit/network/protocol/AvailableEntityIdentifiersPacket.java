@@ -12,6 +12,7 @@ import cn.nukkit.nbt.tag.Tag;
 import com.google.common.io.ByteStreams;
 import lombok.ToString;
 
+import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.nio.ByteOrder;
 
@@ -23,15 +24,16 @@ public class AvailableEntityIdentifiersPacket extends DataPacket {
 
     static {
         try {
-            NBTInputStream inputStream = new NBTInputStream(Nukkit.class.getClassLoader().getResourceAsStream("entity_identifiers.dat"));
+            InputStream inputStream = Nukkit.class.getClassLoader().getResourceAsStream("entity_identifiers.dat");
+
 
             if (inputStream == null) {
                 throw new AssertionError("Could not find entity_identifiers.dat");
             }
             //noinspection UnstableApiUsage
 
-            CompoundTag nbt = new CompoundTag();
-            nbt.load(inputStream);
+            BufferedInputStream bis = new BufferedInputStream(inputStream);
+            CompoundTag nbt = NBTIO.read(bis, ByteOrder.BIG_ENDIAN, true);
             ListTag<CompoundTag> list = nbt.getList("idlist", CompoundTag.class);
 
             for (CustomEntityDefinition definition : Server.getInstance().getCustomEntityManager().getCustomEntitiesDefinition().values()) {
