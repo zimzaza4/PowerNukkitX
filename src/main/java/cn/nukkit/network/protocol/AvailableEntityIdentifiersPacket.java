@@ -1,6 +1,12 @@
 package cn.nukkit.network.protocol;
 
 import cn.nukkit.Nukkit;
+import cn.nukkit.Server;
+import cn.nukkit.entity.custom.CustomEntityDefinition;
+import cn.nukkit.entity.custom.CustomEntityManager;
+import cn.nukkit.nbt.NBTIO;
+import cn.nukkit.nbt.tag.CompoundTag;
+import cn.nukkit.nbt.tag.ListTag;
 import com.google.common.io.ByteStreams;
 import lombok.ToString;
 
@@ -19,7 +25,14 @@ public class AvailableEntityIdentifiersPacket extends DataPacket {
                 throw new AssertionError("Could not find entity_identifiers.dat");
             }
             //noinspection UnstableApiUsage
-            TAG = ByteStreams.toByteArray(inputStream);
+            CompoundTag nbt = NBTIO.read(inputStream);
+            ListTag<CompoundTag> list = nbt.getList("idlist", CompoundTag.class);
+
+            for (CustomEntityDefinition definition : Server.getInstance().getCustomEntityManager().getCustomEntitiesDefinition().values()) {
+                list.add(definition.getNbt());
+            }
+            nbt.putList(list);
+            TAG = NBTIO.writeNetwork(nbt);
         } catch (Exception e) {
             throw new AssertionError("Error whilst loading entity_identifiers.dat", e);
         }

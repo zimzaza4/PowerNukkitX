@@ -13,6 +13,7 @@ import cn.nukkit.dispenser.DispenseBehaviorRegister;
 import cn.nukkit.entity.Attribute;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.EntityHuman;
+import cn.nukkit.entity.custom.CustomEntityManager;
 import cn.nukkit.entity.data.Skin;
 import cn.nukkit.entity.item.*;
 import cn.nukkit.entity.mob.*;
@@ -184,6 +185,8 @@ public class Server {
     private FunctionManager functionManager;
 
     private TickingAreaManager tickingAreaManager;
+
+    private CustomEntityManager customEntityManager;
 
     private int maxPlayers;
 
@@ -720,6 +723,7 @@ public class Server {
 
         tickingAreaManager = new SimpleTickingAreaManager(new JSONTickingAreaStorage(this.dataPath + "worlds/"));
 
+        customEntityManager = new CustomEntityManager();
         // Convert legacy data before plugins get the chance to mess with it.
         try {
             nameLookup = Iq80DBFactory.factory.open(new File(dataPath, "players"), new Options()
@@ -1851,6 +1855,8 @@ public class Server {
     public TickingAreaManager getTickingAreaManager() {
         return tickingAreaManager;
     }
+
+    public CustomEntityManager getCustomEntityManager() { return customEntityManager; }
 
     public ServerScheduler getScheduler() {
         return scheduler;
