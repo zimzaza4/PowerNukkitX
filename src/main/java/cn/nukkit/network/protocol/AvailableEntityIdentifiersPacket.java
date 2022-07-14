@@ -30,7 +30,8 @@ public class AvailableEntityIdentifiersPacket extends DataPacket {
             }
             //noinspection UnstableApiUsage
 
-            CompoundTag nbt = (CompoundTag) Tag.readNamedTag(inputStream);
+            CompoundTag nbt = new CompoundTag();
+            nbt.load(inputStream);
             ListTag<CompoundTag> list = nbt.getList("idlist", CompoundTag.class);
 
             for (CustomEntityDefinition definition : Server.getInstance().getCustomEntityManager().getCustomEntitiesDefinition().values()) {
