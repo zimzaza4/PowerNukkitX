@@ -29,14 +29,14 @@ public class AvailableEntityIdentifiersPacket extends DataPacket {
             //noinspection UnstableApiUsage
 
             BufferedInputStream bis = new BufferedInputStream(inputStream);
-            CompoundTag nbt = NBTIO.read(bis, ByteOrder.LITTLE_ENDIAN, false);
+            CompoundTag nbt = NBTIO.read(bis, ByteOrder.BIG_ENDIAN, true);
             ListTag<CompoundTag> list = nbt.getList("idlist", CompoundTag.class);
             for (CustomEntityDefinition definition : Server.getInstance().getCustomEntityManager().getCustomEntitiesDefinition().values()) {
                 list.add(definition.nbt());
             }
             nbt.putList(list);
             System.out.println(nbt);
-            TAG = NBTIO.write(nbt, ByteOrder.LITTLE_ENDIAN, false);
+            TAG = NBTIO.write(nbt, ByteOrder.BIG_ENDIAN, true);
         } catch (Exception e) {
             throw new AssertionError("Error whilst loading entity_identifiers.dat", e);
         }
