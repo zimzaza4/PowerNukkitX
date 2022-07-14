@@ -40,7 +40,7 @@ public class AvailableEntityIdentifiersPacket extends DataPacket {
                 list.add(definition.nbt());
             }
             nbt.putList(list);
-            TAG = NBTIO.write(nbt, ByteOrder.BIG_ENDIAN, false);
+            TAG = NBTIO.write((CompoundTag) nbt.getAllTags(), ByteOrder.BIG_ENDIAN, false);
         } catch (Exception e) {
             throw new AssertionError("Error whilst loading entity_identifiers.dat", e);
         }
